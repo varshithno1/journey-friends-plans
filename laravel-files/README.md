@@ -10,6 +10,10 @@ composer create-project laravel/laravel travel-planner
 composer require laravel/breeze --dev
 php artisan breeze:install api
 
+# Install Laravel Sanctum
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+
 # Install dependencies and build
 composer install
 npm install
@@ -37,3 +41,4 @@ php artisan make:controller Api/ProfileController --api
 # Run migrations
 php artisan migrate
 ```
+
