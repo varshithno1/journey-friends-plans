@@ -15,7 +15,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->date('start_date');
             $table->date('end_date');
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('created_by')->constrained('travel_users');
             $table->enum('status', ['draft', 'active', 'completed'])->default('draft');
             $table->timestamps();
         });

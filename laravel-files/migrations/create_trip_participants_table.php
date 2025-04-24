@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('trip_participants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('trip_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('travel_users')->onDelete('cascade');
             $table->enum('role', ['owner', 'participant'])->default('participant');
             $table->timestamps();
         });
