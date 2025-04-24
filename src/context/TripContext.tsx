@@ -1,8 +1,10 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { API_URL } from '@/config/api';
 import { toast } from 'sonner';
 
-export type Activity = {
+// Define the Activity interface without method implementations
+export interface Activity {
   id: number;
   trip_id: number;
   title: string;
@@ -13,9 +15,9 @@ export type Activity = {
   cost: number | null;
   day: number;
   category: 'Sightseeing' | 'Food' | 'Transportation' | 'Accommodation' | 'Other';
-  get startTime(): string { return this.start_time; }
-  get endTime(): string | null { return this.end_time; }
-};
+  startTime: string; // Property instead of getter
+  endTime: string | null; // Property instead of getter
+}
 
 export type Trip = {
   id: number;
@@ -70,7 +72,16 @@ export const TripProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const data = await response.json();
-      setUserTrips(data);
+      // Map the API response to add the startTime and endTime properties
+      const tripsWithMappedActivities = data.map((trip: any) => ({
+        ...trip,
+        activities: trip.activities.map((activity: any) => ({
+          ...activity,
+          startTime: activity.start_time,
+          endTime: activity.end_time
+        }))
+      }));
+      setUserTrips(tripsWithMappedActivities);
     } catch (error) {
       console.error('Error fetching trips:', error);
       toast.error('Failed to load trips');
@@ -218,12 +229,18 @@ export const TripProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const newActivity = await response.json();
+      // Add the startTime and endTime properties
+      const mappedActivity = {
+        ...newActivity,
+        startTime: newActivity.start_time,
+        endTime: newActivity.end_time
+      };
       
       setUserTrips(prev => prev.map(trip => {
         if (trip.id === tripId) {
           return {
             ...trip,
-            activities: [...trip.activities, newActivity]
+            activities: [...trip.activities, mappedActivity]
           };
         }
         return trip;
@@ -269,13 +286,19 @@ export const TripProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const updatedActivity = await response.json();
+      // Add the startTime and endTime properties
+      const mappedActivity = {
+        ...updatedActivity,
+        startTime: updatedActivity.start_time,
+        endTime: updatedActivity.end_time
+      };
       
       setUserTrips(prev => prev.map(trip => {
         if (trip.id === tripWithActivity.id) {
           return {
             ...trip,
             activities: trip.activities.map(activity => 
-              activity.id === activityId ? { ...activity, ...updatedActivity } : activity
+              activity.id === activityId ? { ...activity, ...mappedActivity } : activity
             )
           };
         }
