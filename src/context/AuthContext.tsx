@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { API_URL } from '@/config/api';
 
 export type User = {
   id: number;
@@ -69,31 +70,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // This would be an API call in a real app
     setIsLoading(true);
     try {
-      // Simulating API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Real API call to register a user
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          password_confirmation: password, // Laravel typically requires password confirmation
+        }),
+      });
       
-      const existingUser = mockUsers.find(u => u.email === email);
-      if (existingUser) {
-        toast.error('User with this email already exists');
+      const data = await response.json();
+      
+      if (!response.ok) {
+        // Handle validation errors from the API
+        if (data.errors) {
+          Object.values(data.errors).forEach((errorArray: any) => {
+            errorArray.forEach((error: string) => {
+              toast.error(error);
+            });
+          });
+        } else {
+          toast.error(data.message || 'Registration failed');
+        }
         return false;
       }
       
-      const newUser: User = {
-        id: mockUsers.length + 1,
-        name,
-        email,
-        role: 'user',
-        validated: false,
-      };
-      
-      // In a real app, we would save to database
-      mockUsers.push(newUser);
-      
       toast.success('Registration successful! Please wait for admin validation.');
       return true;
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Failed to register. Please try again later.');
+      return false;
     } finally {
       setIsLoading(false);
     }

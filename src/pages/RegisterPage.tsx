@@ -29,6 +29,11 @@ const RegisterPage: React.FC = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <RegisterForm />
+        <div className="mt-4 px-4 py-3 bg-blue-50 border border-blue-100 rounded-md">
+          <p className="text-sm text-blue-700">
+            After registering, your account will be pending until an administrator validates it.
+          </p>
+        </div>
       </div>
     </div>
   );
